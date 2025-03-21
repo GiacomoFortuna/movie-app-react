@@ -1,21 +1,37 @@
 // src/App.tsx
 import './App.css';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { CardContainer } from './components/CardContainer';
-// import { SimpleGrid } from "@chakra-ui/react"
+import { SearchBar } from './components/SearchBar';
+import { SearchProvider } from './context/SearchContext';
 
 function App() {
   return (
-    <div>
-      <h1>MovieApp</h1>
-
-      {/* Componenti CardContainer per i diversi tipi di contenuto */}
-      
-      {/* <SimpleGrid columns={3} gap={40}> */}
-        <CardContainer url="movie/day" section="Trending Movies" />
-      {/* </SimpleGrid> */}
-      <CardContainer url="person/day" section="Trending People"/>
-      <CardContainer url="tv/day" section="Trending TV" />
-    </div>
+    <Router>
+      <SearchProvider>
+        <div>
+          <SearchBar />
+          <h1>MovieApp</h1>
+          
+          <Routes>
+            <Route path="/" element={
+              <>
+                <CardContainer url="trending/movie/day" section="Trending Movies" />
+                <CardContainer url="trending/person/day" section="Trending People"/>
+                <CardContainer url="trending/tv/day" section="Trending TV" />
+              </>
+            } />
+            <Route path="/:mediaType/:id" element={
+              <>
+                <CardContainer url="trending/movie/day" section="Trending Movies" />
+                <CardContainer url="trending/person/day" section="Trending People"/>
+                <CardContainer url="trending/tv/day" section="Trending TV" />
+              </>
+            } />
+          </Routes>
+        </div>
+      </SearchProvider>
+    </Router>
   );
 }
 
