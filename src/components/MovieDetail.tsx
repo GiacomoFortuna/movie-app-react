@@ -20,17 +20,16 @@ type MovieDetailProps = {
 }
 
 export const MovieDetail = ({ element, isOpen, onClose }: MovieDetailProps) => {
-  const navigate = useNavigate();
-
-  const handleClose = () => {
-    onClose();
-    navigate(-1);
-  };
-
   if (!element) return null;
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} size="xl">
+    <Modal 
+      isOpen={isOpen} 
+      onClose={onClose}
+      size="xl"
+      motionPreset="slideInBottom"
+      closeOnOverlayClick={true}
+    >
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>{element.title || element.name}</ModalHeader>

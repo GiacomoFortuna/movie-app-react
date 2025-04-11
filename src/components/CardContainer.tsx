@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { ElementType } from "../types/elementTypes";
 import { getElement } from "../api/element";
 import { MyCard } from "./MyCard";
-import { SimpleGrid, Heading, Box } from "@chakra-ui/react";
+import { SimpleGrid, Heading, Box, Skeleton, VStack } from "@chakra-ui/react";
 import { useSearch } from "../context/SearchContext";
 import { useParams, useLocation } from 'react-router-dom';
 import { MovieDetail } from './MovieDetail';
@@ -15,10 +15,8 @@ type CardContainerProps = {
 export const CardContainer = ({ url, section }: CardContainerProps) => {
     const [element, setElement] = useState<ElementType[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const { searchResults } = useSearch();
-    const { id, mediaType } = useParams();
-    const location = useLocation();
-    const selectedElement = location.state?.element;
+    const { searchResults, selectedElement, isModalOpen, setIsModalOpen } = useSearch();
+    // Removed unused destructuring of useParams
 
     useEffect(() => {
         const fetchElement = async () => {
@@ -40,25 +38,45 @@ export const CardContainer = ({ url, section }: CardContainerProps) => {
         fetchElement();
     }, [url, searchResults]);
 
+    const handleModalClose = () => {
+        setIsModalOpen(false);
+    };
+
     if (isLoading) {
-        return <Box>Loading...</Box>;
+        return (
+            <VStack spacing={4} w="full">
+                <Heading textAlign="left" size="xl" w="full" color="red.500">
+                    {section}
+                </Heading>
+                <SimpleGrid columns={[1, 2, 3]} gap={8} w="full">
+                    {[1, 2, 3].map((i) => (
+                        <Skeleton key={i} height="400px" borderRadius="lg" />
+                    ))}
+                </SimpleGrid>
+            </VStack>
+        );
+    }
+
+    // Don't render if there are search results and this isn't the first container
+    if (searchResults?.length > 0 && section !== "Trending Movies") {
+        return null;
     }
 
     return (
-        <>
-            <Heading textAlign="left" size="2xl" p={5}>
+        <VStack spacing={4} w="full">
+            <Heading textAlign="left" size="xl" w="full" color="red.500">
                 {searchResults?.length ? "Search Results" : section}
             </Heading>
-            <SimpleGrid columns={3} gap={10}>
+            <SimpleGrid columns={[1, 2, 3]} gap={8} w="full">
                 {element?.map((item) => (
                     <MyCard key={item.id} element={item} />
                 ))}
             </SimpleGrid>
             <MovieDetail 
                 element={selectedElement}
-                isOpen={!!id && mediaType === url.split('/')[1]}
-                onClose={() => {}}
+                isOpen={isModalOpen}
+                onClose={handleModalClose}
             />
-        </>
+        </VStack>
     );
 };

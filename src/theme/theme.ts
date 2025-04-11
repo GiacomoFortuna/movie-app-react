@@ -9,8 +9,27 @@ const theme = extendTheme({
     global: {
       'html, body': {
         backgroundColor: 'black !important',
-        color: 'white',
+        color: 'whiteAlpha.900',
+        margin: 0,
+        padding: 0,
         minHeight: '100vh',
+        width: '100%',
+        overflowX: 'hidden'
+      },
+      '#root': {
+        minHeight: '100vh',
+        width: '100%',
+        backgroundColor: 'black !important',
+      },
+      'h1, h2, h3, h4, h5, h6': {
+        color: 'white',
+      },
+      'p, span, div': {
+        color: 'whiteAlpha.900',
+      },
+      'body > div#root': {
+        minHeight: '100vh',
+        backgroundColor: 'black',
       },
       '*': {
         borderColor: 'whiteAlpha.300',

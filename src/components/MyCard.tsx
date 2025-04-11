@@ -5,6 +5,7 @@ import { Box, Image, Text, Button, Stack, Skeleton } from "@chakra-ui/react"
 import { useState } from "react";
 import { FALLBACK_IMAGE_URL } from "../constants/images";
 import { useNavigate } from 'react-router-dom';
+import { useSearch } from "../context/SearchContext";
 
 type CardProps = {
   element: ElementType;
@@ -12,6 +13,7 @@ type CardProps = {
 
 export const MyCard = ({ element }: CardProps) => {
   const navigate = useNavigate();
+  const { setSelectedElement, setIsModalOpen, openModalWithElement } = useSearch();
   const [isImageLoading, setIsImageLoading] = useState(true);
 
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
@@ -26,12 +28,21 @@ export const MyCard = ({ element }: CardProps) => {
   };
 
   const handleClick = () => {
-    navigate(`/${element.media_type}/${element.id}`, { state: { element } });
+    openModalWithElement(element);
   };
 
   const renderImage = (imagePath: string | undefined) => (
-    <Box position="relative" height="200px" width="100%">
-      <Skeleton isLoaded={!isImageLoading} position="absolute" top="0" left="0" width="100%" height="100%">
+    <Box position="relative" height="250px" width="100%">
+      <Skeleton 
+        isLoaded={!isImageLoading} 
+        position="absolute" 
+        top="0" 
+        left="0" 
+        width="100%" 
+        height="100%"
+        startColor="whiteAlpha.100"
+        endColor="whiteAlpha.300"
+      >
         <Image
           src={srcImage(element, imagePath)}
           onError={handleImageError}
@@ -40,8 +51,28 @@ export const MyCard = ({ element }: CardProps) => {
           width="100%"
           height="100%"
           objectFit="cover"
+          transition="transform 0.3s ease-in-out"
+          _hover={{ transform: 'scale(1.05)' }}
         />
       </Skeleton>
+    </Box>
+  );
+
+  const CardWrapper = ({ children }: { children: React.ReactNode }) => (
+    <Box
+      maxW="sm"
+      borderWidth="1px"
+      borderRadius="lg"
+      overflow="hidden"
+      bg="whiteAlpha.50"
+      transition="all 0.3s ease-in-out"
+      _hover={{
+        transform: "translateY(-4px)",
+        boxShadow: "xl",
+        borderColor: "red.500",
+      }}
+    >
+      {children}
     </Box>
   );
 
@@ -53,45 +84,59 @@ export const MyCard = ({ element }: CardProps) => {
   switch (element.media_type) {
     case "movie":
       return (
-        <Box maxW="sm" borderWidth="1px" borderRadius="lg" overflow="hidden">
+        <CardWrapper>
           {renderImage(element.backdrop_path)}
           <Box p="6">
-            <Text fontSize="xl" fontWeight="bold" mb={2}>{element.title || 'Untitled'}</Text>
-            <Text noOfLines={3}>{element.overview || 'No description available'}</Text>
+            <Text fontSize="xl" fontWeight="bold" mb={2} color="white">
+              {element.title || 'Untitled'}
+            </Text>
+            <Text noOfLines={3} color="whiteAlpha.900">
+              {element.overview || 'No description available'}
+            </Text>
             <Button mt={4} colorScheme="blue" width="full" disabled={isImageLoading} onClick={handleClick}>
               Learn More
             </Button>
           </Box>
-        </Box>
+        </CardWrapper>
       );
 
     case "person":
       return (
-        <Box maxW="sm" borderWidth="1px" borderRadius="lg" overflow="hidden">
+        <CardWrapper>
           {renderImage(element.profile_path)}
           <Box p="6">
             <Stack gap={2}>
-              <Text fontSize="xl" fontWeight="bold">{element.name || 'Unknown'}</Text>
-              <Text><b>Role:</b> {element.known_for_department || 'Not specified'}</Text>
-              <Text><b>Popularity:</b> {element.popularity?.toFixed(1) || 'N/A'}</Text>
+              <Text fontSize="xl" fontWeight="bold" color="white">
+                {element.name || 'Unknown'}
+              </Text>
+              <Text color="whiteAlpha.900">
+                <b>Role:</b> {element.known_for_department || 'Not specified'}
+              </Text>
+              <Text color="whiteAlpha.900">
+                <b>Popularity:</b> {element.popularity?.toFixed(1) || 'N/A'}
+              </Text>
               <Button colorScheme="blue" width="full" disabled={isImageLoading} onClick={handleClick}>Learn More</Button>
             </Stack>
           </Box>
-        </Box>
+        </CardWrapper>
       );
 
     case "tv":
       return (
-        <Box maxW="sm" borderWidth="1px" borderRadius="lg" overflow="hidden">
+        <CardWrapper>
           {renderImage(element.backdrop_path)}
           <Box p="6">
-            <Text fontSize="xl" fontWeight="bold" mb={2}>{element.name || 'Untitled'}</Text>
-            <Text>{element.overview || 'No description available'}</Text>
+            <Text fontSize="xl" fontWeight="bold" mb={2} color="white">
+              {element.name || 'Untitled'}
+            </Text>
+            <Text color="whiteAlpha.900">
+              {element.overview || 'No description available'}
+            </Text>
             <Button mt={4} colorScheme="blue" width="full" disabled={isImageLoading} onClick={handleClick}>
               Learn More
             </Button>
           </Box>
-        </Box>
+        </CardWrapper>
       );
       
     default:
